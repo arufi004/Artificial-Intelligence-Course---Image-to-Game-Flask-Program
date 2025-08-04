@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>8-Puzzle Image Game</title>
+
+    <!-- Link to the CSS style sheet -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <h1>8-Puzzle Image Game</h1>
+    <!-- Image Upload Form -->
+    <form method="post" enctype="multipart/form-data">
+        <input type="file" name="image" accept="image/*">
+        <button type="submit">Upload Image</button>
+    </form>
+    <!-- Game board -->
+    {% if image_path %}
+    <div class="game-container">
+        <!-- Puzzle Board Grid.  -->
+        <div class="puzzle-board">
+            {% for row in game.board %}
+                {% for tile in row %}
+                    {% if tile != 8 %} <!-- Empty tile -->
+                        <!-- Code still seems to work even with this line of code giving an error?  Regardless, this shows the tiles with segments -->
+                        <div class="puzzle-tile"
+                             style="background-image: url('{{ url_for('uploaded_file', filename=image_path) }}');
+                                    background-position: -{{ (tile % 3) * 200 }}px -{{ (tile // 3) * 200 }}px;">
+                        </div>
+                    {% else %} <!-- Empty Tile -->
+                        <div class="puzzle-tile empty"></div>
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </div>
+
+        <div class="controls">
+            <!-- Movement controls. Represented as buttons with arrows.  -->
+            <form method="post">
+                <button type="submit" name="move" value="up">↑</button>
+                <button type="submit" name="move" value="down">↓</button>
+                <button type="submit" name="move" value="left">←</button>
+                <button type="submit" name="move" value="right">→</button>
+            </form>
+            <!-- Game Actions -->
+            <form method="post">
+                <button type="submit" name="shuffle">Shuffle</button>
+                <button type="submit" name="solve">Solve</button>
+            </form>
+        </div>
+
+        {% if solution %}
+        <div class="solution">
+            <!-- Renders the solution if available. -->
+            <h3>Solution ({{ solution|length }} moves):</h3>
+            <ol>
+                {% for move in solution %}
+                    <li>{{ move }}</li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+
+        {% if game.is_solved %}
+        <div class="congrats">Congratulations! You solved the puzzle!</div>
+        {% endif %}
+    </div>
+    {% endif %}
+</body>
+</html>
